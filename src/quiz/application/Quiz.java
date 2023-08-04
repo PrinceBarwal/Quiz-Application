@@ -7,13 +7,20 @@ public class Quiz extends JFrame implements ActionListener {
     
     String questions[][] = new String[10][5];
     String answers[][] = new String [10][2];
+    String user_answer[][] = new String[10][1];
     JLabel  qno , question;
     JRadioButton option1 , option2 , option3 , option4;
     JButton lifeLine , next , submit;
+    ButtonGroup group;
     public static int timer = 15;
+    public static int ans_given = 0;
+    public static int count = 0;
+    public static int score = 0;
+    String name;
     
     
-    Quiz(){
+    Quiz(String name){
+        this.name = name;
         setSize(1366 , 768);
         setLocation(0 , 0);
         getContentPane().setBackground(Color.WHITE);
@@ -62,7 +69,7 @@ public class Quiz extends JFrame implements ActionListener {
         add(option4);
         
         
-        ButtonGroup group = new ButtonGroup();
+        group = new ButtonGroup();
         group.add(option1);
         group.add(option2);
         group.add(option3);
@@ -167,7 +174,7 @@ public class Quiz extends JFrame implements ActionListener {
         submit.addActionListener(this);
         add(submit);
         
-        start(0);
+        start(count);
         
         setVisible(true);
     }
@@ -191,7 +198,52 @@ public class Quiz extends JFrame implements ActionListener {
             Thread.sleep(1000);
             repaint();
         }catch(Exception e){
-            e.printStakeTrace();
+            e.printStackTrace();
+        }
+        
+        if(ans_given == 1){
+            ans_given = 0;
+            timer = 15;
+        }else if(timer < 0){
+            timer = 15;
+            option1.setEnabled(true);
+            option2.setEnabled(true);
+            option3.setEnabled(true);
+            option4.setEnabled(true);
+            if(count == 8){
+                next.setEnabled(false);
+                submit.setEnabled(true);
+            
+            }
+            
+            if(count == 9){
+                if(group.getSelection() == null){
+                    user_answer[count][0] = "";
+                }
+                else{
+                    user_answer[count][0] = group.getSelection().getActionCommand();
+                }
+                
+                for(int i=0 ; i<user_answer.length ; i++){
+                    if(user_answer[i][0].equals(answers[i][1])){
+                        score += 10;
+                    }
+                    else{
+                        score += 0;
+                    }
+                }
+                setVisible(false);
+                new Score(name , score); 
+            }else{
+                if(group.getSelection() == null){
+                    user_answer[count][0] = "";
+                }
+                else{
+                    user_answer[count][0] = group.getSelection().getActionCommand();
+                }
+                count++;
+                start(count);
+            }
         }
     }
     
@@ -199,23 +251,76 @@ public class Quiz extends JFrame implements ActionListener {
         qno.setText("" + (count + 1) + ". ");
         question.setText(questions[count][0]);
         option1.setText(questions[count][1]);
+        option1.setActionCommand(questions[count][1]);
         option2.setText(questions[count][2]);
+        option2.setActionCommand(questions[count][2]);
         option3.setText(questions[count][3]);
+        option3.setActionCommand(questions[count][3]);
         option4.setText(questions[count][4]);
+        option4.setActionCommand(questions[count][4]);
         
+        
+        group.clearSelection();
         
     }
     
     public void actionPerformed(ActionEvent ae){
         if(ae.getSource() == lifeLine){
-            setVisible(false);
+            if(count == 2 || count==4 || count==6 || count==8 || count==10){
+                option2.setEnabled(false);
+                option3.setEnabled(false);
+            }
+            else{
+                option1.setEnabled(false);
+                option4.setEnabled(false);
+            }
+            lifeLine.setEnabled(false);
         }
         else if(ae.getSource() == next){
+            repaint();
+            option1.setEnabled(true);
+            option2.setEnabled(true);
+            option3.setEnabled(true);
+            option4.setEnabled(true);
+            ans_given = 1;
+            if(group.getSelection() == null){
+                user_answer[count][0] = "";
+            }
+            else{
+                user_answer[count][0] = group.getSelection().getActionCommand();
+            }
+            
+            if(count == 8){
+                next.setEnabled(false);
+                submit.setEnabled(true);
+            
+            }
+            count++;
+            start(count);
+        }
+        else{
+            ans_given = 1;
+            if(group.getSelection() == null){
+                user_answer[count][0] = "";
+            }
+            else{
+                user_answer[count][0] = group.getSelection().getActionCommand();
+            }
+               
+            for(int i=0 ; i<user_answer.length ; i++){
+                if(user_answer[i][0].equals(answers[i][1])){
+                    score += 10;
+                }
+                else{
+                    score += 0;
+                }
+            }
             setVisible(false);
+            new Score(name , score);
         }
     }
     
     public static void main(String[] args){
-        new Quiz();
+        new Quiz("User");
     }
 }
