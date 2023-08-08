@@ -1,13 +1,17 @@
 package quiz.application;
+//import EnterKeyExample;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.event.KeyEvent;
 
 public class Login extends JFrame implements ActionListener{
     JButton rules , back;
     JTextField nametf;
+    public boolean open = false;
     
     Login(){
+        addKeyListener(new TAdapter());
         setSize(1100 , 500);
         setLocation(150 , 150);
         setLayout(null);
@@ -49,6 +53,7 @@ public class Login extends JFrame implements ActionListener{
         rules.setForeground(Color.WHITE);
         rules.setFont(new Font("Tahoma" , Font.PLAIN ,17));
         rules.addActionListener(this);
+//        rules.addKeyListener(l);
         add(rules);
         
         back = new JButton("Back");
@@ -59,7 +64,24 @@ public class Login extends JFrame implements ActionListener{
         back.addActionListener(this);
         add(back);
         
+        nametf.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                performAction();
+            }
+        });
+        
         setVisible(true);
+    }
+    
+   private void performAction() {
+        String inputText = nametf.getText();
+        // Replace this with the actual action you want to perform
+//        JOptionPane.showMessageDialog(this, "Entered: " + inputText);
+    
+        nametf.setText(""); // Clear the text field
+        setVisible(false);
+        new Rules(inputText);
     }
     
     public void actionPerformed(ActionEvent ae){
@@ -67,13 +89,36 @@ public class Login extends JFrame implements ActionListener{
             String name = nametf.getText();
             setVisible(false);
             new Rules(name);
+           
         }
+       
         else{
             setVisible(false);
+        }
+       
+    }
+    
+    public class TAdapter extends KeyAdapter{
+        
+        @Override
+        public void keyPressed(KeyEvent e){
+            int key = e.getKeyCode();
+//            String name = nametf.getText();
+            
+            
+            if(key == KeyEvent.VK_ENTER){
+//                open = true;            
+            }
         }
     }
     
     public static void main(String[] args){
-        new Login();
+//        new Login();
+    SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Login();
+            }
+        });
     }
 }
